@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="h3 mb-0">我的書單</h2>
+</div>
+
+{% if books %}
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for book in books %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                {% if book.cover_image %}
+                    <img src="{{ url_for('static', filename=book.cover_image) }}" class="card-img-top book-cover" alt="{{ book.title }}">
+                {% else %}
+                    <div class="card-img-top book-cover bg-secondary d-flex align-items-center justify-content-center text-white">
+                        <i class="bi bi-image fs-1"></i>
+                    </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-truncate" title="{{ book.title }}">{{ book.title }}</h5>
+                    <div class="text-warning mb-2">
+                        {% for i in range(book.rating) %}★{% endfor %}{% for i in range(5 - book.rating) %}☆{% endfor %}
+                    </div>
+                    <p class="card-text text-muted small mb-3 flex-grow-1">
+                        {{ book.notes | truncate(50, True, '...') }}
+                    </p>
+                    <a href="{{ url_for('book_bp.book_detail', id=book.id) }}" class="btn btn-outline-primary btn-sm w-100 mt-auto">
+                        查看詳情
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5 bg-white rounded shadow-sm border-0">
+        <i class="bi bi-journal-x text-muted mb-3" style="font-size: 4rem;"></i>
+        <h4 class="text-muted">目前沒有書籍紀錄</h4>
+        <p class="text-muted mb-4">趕快新增你的第一本讀書筆記吧！</p>
+        <a href="{{ url_for('book_bp.create_book_form') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>新增筆記
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

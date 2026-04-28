@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('book_bp.index') }}">書單首頁</a></li>
+        {% if mode == 'edit' %}
+            <li class="breadcrumb-item"><a href="{{ url_for('book_bp.book_detail', id=book.id) }}">{{ book.title }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">編輯筆記</li>
+        {% else %}
+            <li class="breadcrumb-item active" aria-current="page">新增筆記</li>
+        {% endif %}
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h4 class="mb-0">{% if mode == 'edit' %}編輯閱讀紀錄{% else %}新增閱讀紀錄{% endif %}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form action="{% if mode == 'edit' %}{{ url_for('book_bp.update_book', id=book.id) }}{% else %}{{ url_for('book_bp.create_book') }}{% endif %}" method="POST" enctype="multipart/form-data">
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label text-dark fw-bold">書名 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="title" name="title" required
+                               value="{% if mode == 'edit' %}{{ book.title }}{% endif %}" placeholder="例如：原子習慣">
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label text-dark fw-bold">開始閱讀日期</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date"
+                                   value="{% if mode == 'edit' %}{{ book.start_date }}{% endif %}">
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label for="end_date" class="form-label text-dark fw-bold">完讀日期</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date"
+                                   value="{% if mode == 'edit' %}{{ book.end_date }}{% endif %}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="rating" class="form-label text-dark fw-bold">書籍評分 (1-5) <span class="text-danger">*</span></label>
+                        <select class="form-select" id="rating" name="rating" required>
+                            <option value="" disabled {% if mode != 'edit' %}selected{% endif %}>請選擇評分</option>
+                            {% for i in range(5, 0, -1) %}
+                                <option value="{{ i }}" {% if mode == 'edit' and book.rating == i %}selected{% endif %}>
+                                    {{ i }} 顆星
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cover_image" class="form-label text-dark fw-bold">封面圖片</label>
+                        <input class="form-control" type="file" id="cover_image" name="cover_image" accept="image/png, image/jpeg, image/gif">
+                        <div class="form-text">支援格式：JPG, PNG, GIF。若不修改請留空。</div>
+                        
+                        {% if mode == 'edit' and book.cover_image %}
+                            <div class="mt-2">
+                                <span class="text-muted small">目前圖片：</span><br>
+                                <img src="{{ url_for('static', filename=book.cover_image) }}" alt="Current cover" style="height: 100px; object-fit: cover;" class="rounded shadow-sm">
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="notes" class="form-label text-dark fw-bold">閱讀心得與筆記 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="notes" name="notes" rows="8" required placeholder="寫下你的收穫與想法...">{% if mode == 'edit' %}{{ book.notes }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% if mode == 'edit' %}{{ url_for('book_bp.book_detail', id=book.id) }}{% else %}{{ url_for('book_bp.index') }}{% endif %}" class="btn btn-outline-secondary px-4">取消</a>
+                        <button type="submit" class="btn btn-primary px-4">{% if mode == 'edit' %}儲存修改{% else %}建立紀錄{% endif %}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
